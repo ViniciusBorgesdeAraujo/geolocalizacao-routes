@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocalização Rotas</title>    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+
+		.leaflet-marker-icon,
+		.leaflet-marker-shadow {
+			display: none !important;
+		}
+
+		.pointers,
+		.diesel-pointers {
+			display: block !important;
+		}
+      
+	</style>
+
+</head>
+
+<body> 
+    
+    <div id="map" style="width:100%; height: 100vh"></div>
+	<script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"></script>
+	<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+    <div id="map" style="width:100%; height: 100vh"></div>   
+    <script>
+        // Personalizar css no mapa
+        let myCustomColourUser = 'background-color: red;'
+        const markerHtml = `
+            width: 2rem;
+            height: 2rem;
+            display: block;
+            left: -1.5rem;
+            top: -1.5rem;
+            position: relative;
+            border-radius: 3rem 3rem 0;
+            transform: rotate(45deg);
+            border: 3px solid red;`
+
+        // Coordenadas do Ponta A - Disel
+        const coordDiesel = [-16.698564414576296, -49.28084210873006];  
+        // Coordenadas do Ponta B - Usuário
+        const coordUser = [-16.69912306544098, -49.283535905810815];
+
+        // Iniciar o mapa com coordenadas do ponto A
+        const map = L.map('map').setView(coordDiesel, 40);
+
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
+
+
+        // Personalizar Ponto na mapa com imagem do diesel.
+        const dieselIcon = L.icon({
+            className: "diesel-pointers",
+            iconUrl: 'diesel.png',
+            iconSize: [45, 45]
+        })
+        const marker = L.marker(coordDiesel, { icon: dieselIcon }).addTo(map);    
+
+
+        function startService () {
+            // Array de coordenadas. Simula o diesel enviando a localização para o APP.
+            const latlng = [
+            { lat: -16.698564414576296, lng: -49.28084210873006 },
+            { lat: -16.69830750446437, lng:-49.28104595660381 },
+            { lat: -16.698245845986072, lng:-49.28121761797117 },
+            { lat: -16.69836916292275, lng:-49.28138927933853 },
+            { lat: -16.69858496737033, lng:-49.2817218732378},
+            { lat: -16.69886242987321, lng:-49.2820973824789 },
+            { lat: -16.699088510133095, lng:-49.28242997637816 },
+            { lat: -16.699314590125358, lng:-49.28278402794835 },
+            { lat: -16.699448182722264, lng:-49.28299860465756},
+            { lat: -16.699571498882623, lng:-49.28318099486038 },
+            { lat: -16.69939680096528, lng:-49.2833097408859},
+            { lat: -16.699252931972186, lng:-49.28340630040504 },
+            {lat: -16.69912306544098, lng:-49.283535905810815},
+            ]
+
+        // Personalizar Ponto na mapa com imagem do Usuário.
+            const icon = L.divIcon({
+                className: "pointers",
+                iconAnchor: [0, 24],
+                labelAnchor: [-6, 0],
+                popupAnchor: [0, -36],
+                html: `<span style="${markerHtml}${myCustomColourUser}" />`
+            })
+            var newMarker = L.marker([coordUser[0], coordUser[1]], { icon }).addTo(map);
+
+            // Identifica a melhor rota para iniciar a viagem.
+            L.Routing.control({
+                waypoints: [
+                    L.latLng(coordDiesel[0], coordDiesel[1]),
+                    L.latLng(coordUser[0], coordUser[1])
+                ]
+            }).on('routesfound', function (e) {
+                // Loop de coordenadas. Simula o táxi enviando a localização para o APP.
+                latlng.forEach(function (coord, index) {
+                    setTimeout(function () {
+                        marker.setLatLng([coord.lat, coord.lng]);
+                        // Identifica o final da viagem.
+                        if (coord.lat === coordUser[0] && coord.lng === coordUser[1]) {
+                            alert('Seu caminhão chegou ao Posto de Gasolina Ipiranga!')
+                        }
+                    }, 1000 * index)
+                })
+
+            }).addTo(map);
+        };
+
+        startService()
+
+    </script>
+
+</body>
+
+</html>

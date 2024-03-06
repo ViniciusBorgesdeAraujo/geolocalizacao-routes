@@ -103,7 +103,7 @@
                     L.latLng(coordUser[0], coordUser[1])
                 ]
             }).on('routesfound', function (e) {
-                // Loop de coordenadas. Simula o táxi enviando a localização para o APP.
+                // Loop de coordenadas. Simula o caminhao enviando a localização para o APP.
                 latlng.forEach(function (coord, index) {
                     setTimeout(function () {
                         marker.setLatLng([coord.lat, coord.lng]);
